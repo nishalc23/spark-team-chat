@@ -18,6 +18,10 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        spark: "bg-gradient-primary text-white shadow-button hover:shadow-accent hover:scale-105 transition-all duration-300",
+        "spark-outline": "border-2 border-spark-purple text-spark-purple bg-transparent hover:bg-spark-purple hover:text-white transition-all duration-300",
+        warm: "bg-gradient-warm text-white shadow-accent hover:shadow-button hover:scale-105 transition-all duration-300",
+        success: "bg-gradient-success text-white hover:opacity-90 transition-opacity duration-300"
       },
       size: {
         default: "h-10 px-4 py-2",
