@@ -30,11 +30,11 @@ export const Landing = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-6">
+          <div className="flex flex-col items-center justify-center mb-6">
             <img 
               src={teamsparkLogo} 
               alt="TeamSpark" 
-              className="w-12 h-12 animate-float"
+              className="w-16 h-16 mb-4 animate-galaxy-pulse"
             />
             <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
               TeamSpark

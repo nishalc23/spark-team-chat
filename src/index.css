@@ -8,50 +8,51 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 240 10% 98%;
-    --foreground: 240 10% 9%;
+    /* Galaxy Black Theme */
+    --background: 0 0% 3%;
+    --foreground: 0 0% 95%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 9%;
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 9%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 95%;
 
     --primary: 258 90% 66%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 240 10% 9%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 85%;
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 240 4% 46%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 65%;
 
     --accent: 14 100% 66%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 95%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
     --ring: 258 90% 66%;
 
-    /* TeamSpark Brand Colors */
-    --spark-purple: 258 90% 66%;
-    --spark-blue: 221 100% 65%;
-    --spark-coral: 14 100% 66%;
-    --spark-green: 142 76% 36%;
+    /* Enhanced TeamSpark Brand Colors */
+    --spark-purple: 258 90% 70%;
+    --spark-blue: 221 100% 70%;
+    --spark-coral: 14 100% 68%;
+    --spark-green: 142 76% 45%;
     
-    /* Gradients */
+    /* Galaxy Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(var(--spark-purple)), hsl(var(--spark-blue)));
     --gradient-warm: linear-gradient(135deg, hsl(var(--spark-coral)), hsl(14 100% 76%));
-    --gradient-success: linear-gradient(135deg, hsl(var(--spark-green)), hsl(142 76% 46%));
-    --gradient-subtle: linear-gradient(180deg, hsl(240 10% 98%), hsl(220 14% 96%));
+    --gradient-success: linear-gradient(135deg, hsl(var(--spark-green)), hsl(142 76% 55%));
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 3%), hsl(0 0% 8%));
     
-    /* Shadows */
-    --shadow-card: 0 4px 20px -4px hsl(var(--spark-purple) / 0.1);
-    --shadow-button: 0 8px 25px -8px hsl(var(--spark-purple) / 0.3);
-    --shadow-accent: 0 8px 25px -8px hsl(var(--spark-coral) / 0.3);
+    /* Enhanced Glow Shadows */
+    --shadow-card: 0 8px 32px -8px hsl(var(--spark-purple) / 0.3), 0 0 20px hsl(var(--spark-purple) / 0.1);
+    --shadow-button: 0 8px 25px -8px hsl(var(--spark-purple) / 0.4), 0 0 30px hsl(var(--spark-purple) / 0.2);
+    --shadow-accent: 0 8px 25px -8px hsl(var(--spark-coral) / 0.4), 0 0 30px hsl(var(--spark-coral) / 0.2);
     
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
