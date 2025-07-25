@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Zap, Users, MessageCircle, Trophy } from "lucide-react";
 import teamsparkLogo from "@/assets/teamspark-logo.png";
+import { useNavigate } from "react-router-dom";
+
 
 export const Landing = () => {
   const [teamName, setTeamName] = useState("");
