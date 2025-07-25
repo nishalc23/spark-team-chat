@@ -1,23 +1,28 @@
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { QuestionCard } from "@/components/QuestionCard";
 import { Share2, Copy, Users, Calendar, Trophy, Sparkles } from "lucide-react";
 import { mockQuestions } from "@/data/mockData";
-import teamsparkLogo from "@/assets/teamspark-logo.png";
+import teamsparkLogo from "@/assets/new-logo.png";
 
 export const TeamDashboard = () => {
+  const { teamCode } = useParams();
   const [copiedCode, setCopiedCode] = useState(false);
-  
-  // Mock team data
-  const team = {
-    name: "Marketing Mavericks",
-    code: "MKTG2024",
-    memberCount: 8,
-    questionsCompleted: 12,
-    totalQuestions: 15
-  };
+
+  // Load team info from localStorage
+  const storedTeam = localStorage.getItem(`team-${teamCode}`);
+  const team = storedTeam
+    ? JSON.parse(storedTeam)
+    : {
+        name: "Unknown Team",
+        code: teamCode,
+        memberCount: 0,
+        questionsCompleted: 0,
+        totalQuestions: 1
+      };
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(team.code);
@@ -27,15 +32,15 @@ export const TeamDashboard = () => {
 
   const handleAnswerQuestion = (questionId: string) => {
     console.log("Answering question:", questionId);
-    // Navigate to question detail page
   };
 
   const handleViewResponses = (questionId: string) => {
     console.log("Viewing responses for:", questionId);
-    // Navigate to responses page
   };
 
-  const completionPercentage = Math.round((team.questionsCompleted / team.totalQuestions) * 100);
+  const completionPercentage = Math.round(
+    (team.questionsCompleted / team.totalQuestions) * 100
+  );
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
@@ -43,17 +48,12 @@ export const TeamDashboard = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <img 
-              src={teamsparkLogo} 
-              alt="TeamSpark" 
-              className="w-10 h-10"
-            />
+            <img src={teamsparkLogo} alt="TeamSpark" className="w-10 h-10" />
             <div>
               <h1 className="text-3xl font-bold">{team.name}</h1>
               <p className="text-muted-foreground">Team Dashboard</p>
             </div>
           </div>
-          
           <Button variant="spark-outline" onClick={handleCopyCode}>
             {copiedCode ? "Copied!" : "Share Team"}
             <Share2 className="ml-2 h-4 w-4" />
@@ -103,8 +103,8 @@ export const TeamDashboard = () => {
             <CardContent>
               <div className="text-2xl font-bold">{completionPercentage}%</div>
               <div className="w-full bg-muted rounded-full h-2 mt-2">
-                <div 
-                  className="bg-gradient-success h-2 rounded-full transition-all duration-500" 
+                <div
+                  className="bg-gradient-success h-2 rounded-full transition-all duration-500"
                   style={{ width: `${completionPercentage}%` }}
                 />
               </div>
@@ -123,9 +123,14 @@ export const TeamDashboard = () => {
             </div>
             <div>
               <h2 className="text-2xl font-bold">Today's Questions</h2>
-              <p className="text-muted-foreground">New questions available every 24 hours</p>
+              <p className="text-muted-foreground">
+                New questions available every 24 hours
+              </p>
             </div>
-            <Badge variant="outline" className="ml-auto border-spark-purple text-spark-purple">
+            <Badge
+              variant="outline"
+              className="ml-auto border-spark-purple text-spark-purple"
+            >
               <Calendar className="h-3 w-3 mr-1" />
               December 22, 2024
             </Badge>
@@ -145,15 +150,9 @@ export const TeamDashboard = () => {
 
         {/* Quick Actions */}
         <div className="mt-12 flex flex-wrap gap-4 justify-center">
-          <Button variant="spark-outline">
-            View All Completed
-          </Button>
-          <Button variant="ghost">
-            Team Settings
-          </Button>
-          <Button variant="ghost">
-            Invite Members
-          </Button>
+          <Button variant="spark-outline">View All Completed</Button>
+          <Button variant="ghost">Team Settings</Button>
+          <Button variant="ghost">Invite Members</Button>
         </div>
       </div>
     </div>
