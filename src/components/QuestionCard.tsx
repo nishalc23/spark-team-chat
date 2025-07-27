@@ -30,7 +30,7 @@ export const QuestionCard = ({ question, onAnswer, onViewResponses }: QuestionCa
                   : "bg-gradient-primary text-white"
                 }
               >
-                {question.type === "icebreaker" ? "Icebreaker" : "Trivia"}
+                {question.type === "icebreaker" ? "Icebreaker" : "Icebreaker"}
               </Badge>
               {question.timeRemaining && (
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">

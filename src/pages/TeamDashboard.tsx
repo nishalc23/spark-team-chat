@@ -1,160 +1,97 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { QuestionCard } from "@/components/QuestionCard";
-import { Share2, Copy, Users, Calendar, Trophy, Sparkles } from "lucide-react";
-import { mockQuestions } from "@/data/mockData";
-import teamsparkLogo from "@/assets/new-logo.png";
+import { MessageCircle, Users, Clock } from "lucide-react";
 
-export const TeamDashboard = () => {
-  const { teamCode } = useParams();
-  const [copiedCode, setCopiedCode] = useState(false);
-
-  // Load team info from localStorage
-  const storedTeam = localStorage.getItem(`team-${teamCode}`);
-  const team = storedTeam
-    ? JSON.parse(storedTeam)
-    : {
-        name: "Unknown Team",
-        code: teamCode,
-        memberCount: 0,
-        questionsCompleted: 0,
-        totalQuestions: 1
-      };
-
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText(team.code);
-    setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2000);
+interface QuestionCardProps {
+  question: {
+    id: string;
+    text: string;
+    type: "icebreaker" | "trivia";
+    responseCount: number;
+    isAnswered: boolean;
+    timeRemaining?: string;
   };
+  onAnswer: () => void;
+  onViewResponses: () => void;
+}
 
-  const handleAnswerQuestion = (questionId: string) => {
-    console.log("Answering question:", questionId);
-  };
-
-  const handleViewResponses = (questionId: string) => {
-    console.log("Viewing responses for:", questionId);
-  };
-
-  const completionPercentage = Math.round(
-    (team.questionsCompleted / team.totalQuestions) * 100
-  );
-
+export const QuestionCard = ({ question, onAnswer, onViewResponses }: QuestionCardProps) => {
   return (
-    <div className="min-h-screen bg-gradient-subtle">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <img src={teamsparkLogo} alt="TeamSpark" className="w-10 h-10" />
-            <div>
-              <h1 className="text-3xl font-bold">{team.name}</h1>
-              <p className="text-muted-foreground">Team Dashboard</p>
-            </div>
-          </div>
-          <Button variant="spark-outline" onClick={handleCopyCode}>
-            {copiedCode ? "Copied!" : "Share Team"}
-            <Share2 className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Team Stats */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <Card className="border-2 border-spark-purple/20 shadow-card">
-            <CardHeader className="flex flex-row items-center space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Team Code</CardTitle>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleCopyCode}
-                className="ml-auto h-8 w-8"
+    <Card className="group hover:shadow-card transition-all duration-300 border-2 hover:border-spark-coral/20">
+      <CardHeader>
+        <div className="flex items-start justify-between">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Badge 
+                variant={question.type === "icebreaker" ? "default" : "secondary"}
+                className={question.type === "icebreaker" 
+                  ? "bg-gradient-warm text-white" 
+                  : "bg-gradient-primary text-white"
+                }
               >
-                <Copy className="h-4 w-4" />
+                {question.type === "icebreaker" ? "Icebreaker" : "Trivia"}
+              </Badge>
+              {question.timeRemaining && (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Clock className="h-3 w-3" />
+                  {question.timeRemaining}
+                </div>
+              )}
+            </div>
+            <CardTitle className="text-base leading-relaxed group-hover:text-spark-coral transition-colors">
+              {question.text}
+            </CardTitle>
+          </div>
+        </div>
+      </CardHeader>
+      
+      <CardContent>
+        <div className="space-y-4">
+          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              <span>{question.responseCount} responses</span>
+            </div>
+            {question.isAnswered && (
+              <Badge variant="outline" className="border-spark-green text-spark-green">
+                ✓ Answered
+              </Badge>
+            )}
+          </div>
+
+          <div className="flex gap-2">
+            {!question.isAnswered ? (
+              <Button 
+                variant="warm" 
+                className="flex-1" 
+                onClick={onAnswer}
+              >
+                Answer Question
               </Button>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold font-mono">{team.code}</div>
-              <p className="text-xs text-muted-foreground">
-                Share this code with team members
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-2 border-spark-coral/20 shadow-card">
-            <CardHeader className="flex flex-row items-center space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Team Members</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{team.memberCount}</div>
-              <p className="text-xs text-muted-foreground">
-                Active participants
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-2 border-spark-green/20 shadow-card">
-            <CardHeader className="flex flex-row items-center space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Progress</CardTitle>
-              <Trophy className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{completionPercentage}%</div>
-              <div className="w-full bg-muted rounded-full h-2 mt-2">
-                <div
-                  className="bg-gradient-success h-2 rounded-full transition-all duration-500"
-                  style={{ width: `${completionPercentage}%` }}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {team.questionsCompleted}/{team.totalQuestions} completed
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Daily Questions Section */}
-        <div className="space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
-              <Sparkles className="h-4 w-4 text-white" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold">Today's Questions</h2>
-              <p className="text-muted-foreground">
-                New questions available every 24 hours
-              </p>
-            </div>
-            <Badge
-              variant="outline"
-              className="ml-auto border-spark-purple text-spark-purple"
-            >
-              <Calendar className="h-3 w-3 mr-1" />
-              December 22, 2024
-            </Badge>
-          </div>
-
-          <div className="grid gap-6">
-            {mockQuestions.map((question) => (
-              <QuestionCard
-                key={question.id}
-                question={question}
-                onAnswer={() => handleAnswerQuestion(question.id)}
-                onViewResponses={() => handleViewResponses(question.id)}
-              />
-            ))}
+            ) : (
+              <Button 
+                variant="spark-outline" 
+                className="flex-1" 
+                onClick={onAnswer}
+              >
+                Update Answer
+              </Button>
+            )}
+            
+            {question.responseCount > 0 && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={onViewResponses}
+                className="hover:bg-spark-purple/10 hover:text-spark-purple"
+              >
+                <MessageCircle className="h-4 w-4" />
+              </Button>
+            )}
           </div>
         </div>
-
-        {/* Quick Actions */}
-        <div className="mt-12 flex flex-wrap gap-4 justify-center">
-          <Button variant="spark-outline">View All Completed</Button>
-          <Button variant="ghost">Team Settings</Button>
-          <Button variant="ghost">Invite Members</Button>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
