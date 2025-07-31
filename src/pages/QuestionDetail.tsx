@@ -1,41 +1,72 @@
 import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ArrowLeft, Send, Users, MessageCircle, Clock, CheckCircle } from "lucide-react";
-import { mockResponses } from "@/data/mockData";
+import { Textarea } from "@/components/ui/textarea";
+import { mockQuestions, mockResponses } from "@/data/mockData";
 
 export const QuestionDetail = () => {
+  const { teamCode, questionId } = useParams();
+  const navigate = useNavigate();
   const [response, setResponse] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Mock question data
-  const question = {
-    id: "2",
-    text: "What programming language was created by Brendan Eich in just 10 days?",
-    type: "trivia" as const,
-    responseCount: 3,
-    isAnswered: true,
-    timeRemaining: "18h 32m"
-  };
+  // 🔍 Debugging
+  console.log("🔍 questionId from URL:", questionId);
+  console.log("🧩 All mockQuestions IDs:", mockQuestions.map((q) => q.id));
+  console.log("🧩 Type of q.id:", typeof mockQuestions[0]?.id);
 
-  const questionResponses = mockResponses.filter(r => r.questionId === question.id);
+  // Ensure id match even if types differ (string vs number)
+  const question = mockQuestions.find((q) => q.id.toString() === questionId);
+  const questionResponses = mockResponses.filter((r) => r.questionId.toString() === questionId);
+
+  if (!question) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Question Not Found</h1>
+            <p className="text-muted-foreground mb-4">
+              Looking for question ID: "{questionId}"
+            </p>
+            <p className="text-sm text-muted-foreground mb-6">
+              Available questions: {mockQuestions.map((q) => q.id).join(", ")}
+            </p>
+            <Button onClick={() => navigate(`/team/${teamCode}`)}>
+              Back to Dashboard
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleSubmitResponse = async () => {
     if (!response.trim()) return;
-    
+
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     setIsSubmitting(false);
     setResponse("");
-    console.log("Response submitted:", response);
-  };
 
-  const handleBackToDashboard = () => {
-    console.log("Navigate back to dashboard");
+    const teamKey = `team-${teamCode}`;
+    const stored = localStorage.getItem(teamKey);
+    if (stored) {
+      const teamData = JSON.parse(stored);
+      if (!teamData.completedQuestions) teamData.completedQuestions = [];
+
+      if (!teamData.completedQuestions.includes(questionId)) {
+        teamData.completedQuestions.push(questionId);
+        teamData.questionsCompleted = teamData.completedQuestions.length;
+        teamData.totalQuestions = mockQuestions.length;
+        localStorage.setItem(teamKey, JSON.stringify(teamData));
+      }
+    }
+
+    navigate(`/team/${teamCode}`);
   };
 
   return (
@@ -43,10 +74,10 @@ export const QuestionDetail = () => {
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="icon"
-            onClick={handleBackToDashboard}
+            onClick={() => navigate(`/team/${teamCode}`)}
             className="hover:bg-spark-purple/10"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -63,36 +94,29 @@ export const QuestionDetail = () => {
             <div className="flex items-start justify-between">
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <Badge 
-                    variant="default"
-                    className="bg-gradient-primary text-white"
-                  >
-                    Trivia
+                  <Badge variant="default" className="bg-gradient-primary text-white">
+                    {question.type}
                   </Badge>
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <Clock className="h-4 w-4" />
-                    {question.timeRemaining} remaining
+                    {question.timeRemaining || "24h"} remaining
                   </div>
                 </div>
-                <CardTitle className="text-lg leading-relaxed">
-                  {question.text}
-                </CardTitle>
+                <CardTitle className="text-lg leading-relaxed">{question.text}</CardTitle>
               </div>
             </div>
           </CardHeader>
-          
+
           <CardContent>
             <div className="flex items-center gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-muted-foreground" />
-                <span>{question.responseCount} responses</span>
+                <span>{questionResponses.length} responses</span>
               </div>
-              {question.isAnswered && (
-                <Badge variant="outline" className="border-spark-green text-spark-green">
-                  <CheckCircle className="h-3 w-3 mr-1" />
-                  You've answered
-                </Badge>
-              )}
+              <Badge variant="outline" className="border-spark-green text-spark-green">
+                <CheckCircle className="h-3 w-3 mr-1" />
+                You're answering
+              </Badge>
             </div>
           </CardContent>
         </Card>
@@ -104,7 +128,7 @@ export const QuestionDetail = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <MessageCircle className="h-5 w-5 text-spark-coral" />
-                  {question.isAnswered ? "Update Your Answer" : "Your Answer"}
+                  Your Answer
                 </CardTitle>
                 <CardDescription>
                   Share your thoughts and see what your teammates think
@@ -121,8 +145,8 @@ export const QuestionDetail = () => {
                   <span className="text-sm text-muted-foreground">
                     {response.length}/500 characters
                   </span>
-                  <Button 
-                    variant="warm" 
+                  <Button
+                    variant="warm"
                     onClick={handleSubmitResponse}
                     disabled={!response.trim() || isSubmitting}
                     className="min-w-[100px]"
@@ -130,7 +154,7 @@ export const QuestionDetail = () => {
                     {isSubmitting ? "Submitting..." : (
                       <>
                         <Send className="h-4 w-4 mr-2" />
-                        {question.isAnswered ? "Update" : "Submit"}
+                        Submit
                       </>
                     )}
                   </Button>
@@ -163,7 +187,10 @@ export const QuestionDetail = () => {
                             <span className="font-medium">{resp.userName}</span>
                             <span className="text-xs text-muted-foreground">{resp.timestamp}</span>
                             {resp.isCorrect && (
-                              <Badge variant="outline" className="border-spark-green text-spark-green text-xs">
+                              <Badge
+                                variant="outline"
+                                className="border-spark-green text-spark-green text-xs"
+                              >
                                 ✓ Correct
                               </Badge>
                             )}

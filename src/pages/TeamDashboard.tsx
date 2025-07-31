@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,9 +10,17 @@ import teamsparkLogo from "@/assets/new-logo.png";
 
 export const TeamDashboard = () => {
   const { teamCode } = useParams();
+  const navigate = useNavigate();
   const [copiedCode, setCopiedCode] = useState(false);
 
-  // Load team info from localStorage
+  // Format today's date
+  const today = new Date().toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  // Load team info from localStorage or set fallback
   const storedTeam = localStorage.getItem(`team-${teamCode}`);
   const team = storedTeam
     ? JSON.parse(storedTeam)
@@ -20,9 +28,16 @@ export const TeamDashboard = () => {
         name: "Unknown Team",
         code: teamCode,
         memberCount: 0,
-        questionsCompleted: 0,
-        totalQuestions: 1
+        completedQuestions: [],
       };
+
+  // Calculate progress safely
+  const questionsCompleted = team.completedQuestions?.length || 0;
+  const totalQuestions = mockQuestions.length;
+  const completionPercentage =
+    totalQuestions > 0
+      ? Math.round((questionsCompleted / totalQuestions) * 100)
+      : 0;
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(team.code);
@@ -31,16 +46,12 @@ export const TeamDashboard = () => {
   };
 
   const handleAnswerQuestion = (questionId: string) => {
-    console.log("Answering question:", questionId);
+    navigate(`/team/${teamCode}/question/${questionId}`);
   };
 
   const handleViewResponses = (questionId: string) => {
-    console.log("Viewing responses for:", questionId);
+    navigate(`/team/${teamCode}/question/${questionId}`);
   };
-
-  const completionPercentage = Math.round(
-    (team.questionsCompleted / team.totalQuestions) * 100
-  );
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
@@ -89,9 +100,7 @@ export const TeamDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{team.memberCount}</div>
-              <p className="text-xs text-muted-foreground">
-                Active participants
-              </p>
+              <p className="text-xs text-muted-foreground">Active participants</p>
             </CardContent>
           </Card>
 
@@ -109,13 +118,13 @@ export const TeamDashboard = () => {
                 />
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                {team.questionsCompleted}/{team.totalQuestions} completed
+                {questionsCompleted}/{totalQuestions} completed
               </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Daily Questions Section */}
+        {/* Daily Questions */}
         <div className="space-y-6">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
@@ -132,7 +141,7 @@ export const TeamDashboard = () => {
               className="ml-auto border-spark-purple text-spark-purple"
             >
               <Calendar className="h-3 w-3 mr-1" />
-              December 22, 2024
+              {today}
             </Badge>
           </div>
 
@@ -148,7 +157,7 @@ export const TeamDashboard = () => {
           </div>
         </div>
 
-        {/* Quick Actions */}
+        {/* Footer Actions */}
         <div className="mt-12 flex flex-wrap gap-4 justify-center">
           <Button variant="spark-outline">View All Completed</Button>
           <Button variant="ghost">Team Settings</Button>
